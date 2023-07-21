@@ -2,6 +2,7 @@ package com.dev.az.model.entity;
 
 
 import com.dev.az.model.MemberRank;
+import com.dev.az.model.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -17,12 +19,15 @@ import java.util.UUID;
 public class Member {
 
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.AUTO)
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
     @Column(nullable = false, length = 20)
     private String name;
+
+    @Column(nullable = false, length = 100)
+    private String password;
 
     @Embedded
     @Setter
@@ -31,6 +36,10 @@ public class Member {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MemberRank memberRank = MemberRank.BRONZE;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserRole role = UserRole.ROLE_USER;
 
     @Column(nullable = false)
     private Long experience = 0L;
@@ -42,14 +51,21 @@ public class Member {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    List<Submission> submissionList;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    List<ProblemSolvingState> problemSolvingStates;
+
     protected Member() {}
 
-    private Member(String name) {
+    private Member(String name, String password) {
         this.name = name;
+        this.password = password;
     }
 
-    public static Member of(String name, String email) {
-        Member member = new Member(name);
+    public static Member of(String name, String email, String password) {
+        Member member = new Member(name, password);
         member.setEmail(Email.from(email));
 
         return member;
