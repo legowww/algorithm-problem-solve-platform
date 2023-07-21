@@ -4,9 +4,10 @@ spring:
     username: "root"
     password: "0000"
     driver-class-name: com.mysql.cj.jdbc.Driver
-#  sql:
-#    init:
-#      mode: always
+  sql:
+    init:
+      mode: always
+
   jpa:
     hibernate:
       ddl-auto: create
@@ -15,4 +16,10 @@ spring:
         show_sql: true
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
-#        default_batch_fetch_size: 100
+        default_batch_fetch_size: 50
+    defer-datasource-initialization: true
+
+jwt:
+  secret-key: az-security-with-jwt-token-secret-key
+  access-token-expired-time-ms: 1800000
+  refresh-token-expired-time-ms: 604800000
