@@ -7,13 +7,20 @@ import com.dev.az.model.SubmissionResult;
 import com.dev.az.service.ProblemSolvingStateService;
 import com.dev.az.service.SubmissionGradingService;
 import com.dev.az.service.SubmissionService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/submissions")
+@RequiredArgsConstructor
 public class SubmissionController {
 
     private final SubmissionService submissionService;
@@ -22,19 +29,17 @@ public class SubmissionController {
 
     private final ProblemSolvingStateService problemSolvingStateService;
 
-    public SubmissionController(SubmissionService submissionService, SubmissionGradingService submissionGradingService, ProblemSolvingStateService problemSolvingStateService) {
-        this.submissionService = submissionService;
-        this.submissionGradingService = submissionGradingService;
-        this.problemSolvingStateService = problemSolvingStateService;
-    }
-
     @PostMapping
-    public Response<SubmissionResult> submit(@RequestBody SubmissionCreateRequest submissionCreateRequest) {
+    public ResponseEntity<Response<SubmissionResult>> submit(@RequestBody SubmissionCreateRequest submissionCreateRequest, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        UUID memberId = UUID.fromString(user.getUsername());
+
         SubmissionResult submissionResult = submissionGradingService.grade(submissionCreateRequest);
 
-        submissionService.createSubmission(submissionCreateRequest, submissionResult);
-        problemSolvingStateService.createState(submissionCreateRequest, submissionResult);
+        submissionService.createSubmission(memberId, submissionCreateRequest, submissionResult);
+        problemSolvingStateService.createState(memberId, submissionCreateRequest, submissionResult);
 
-        return Response.success(submissionResult);
+        return ResponseEntity.ok()
+                .body(Response.success(submissionResult));
     }
 }

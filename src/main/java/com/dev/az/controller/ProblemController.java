@@ -7,9 +7,11 @@ import com.dev.az.model.Algorithm;
 import com.dev.az.model.ProblemRank;
 import com.dev.az.model.dto.ProblemDto;
 import com.dev.az.service.ProblemService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,18 +19,14 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/problems")
+@RequiredArgsConstructor
 public class ProblemController {
 
     private final ProblemService problemService;
 
-    public ProblemController(ProblemService problemService) {
-        this.problemService = problemService;
-
-    }
-
     @PostMapping
-    public Response<Void> createProblem(@RequestBody ProblemCreateRequest problemCreateRequest) {
-        problemService.createProblem(
+    public ResponseEntity<Response<Long>> createProblem(@RequestBody ProblemCreateRequest problemCreateRequest) {
+        long id = problemService.createProblem(
                 problemCreateRequest.title(),
                 problemCreateRequest.content(),
                 problemCreateRequest.problemCondition(),
@@ -37,11 +35,12 @@ public class ProblemController {
                 problemCreateRequest.algorithm()
         );
 
-        return Response.success(null);
+        return ResponseEntity.ok()
+                .body(Response.success(id));
     }
 
     @GetMapping
-    public Response<List<ProblemDto>> problems(
+    public ResponseEntity<Response<List<ProblemDto>>> problems(
             @RequestParam Optional<ProblemRank> problemRank,
             @RequestParam Optional<Algorithm> algorithm,
             @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
@@ -50,6 +49,7 @@ public class ProblemController {
         ProblemRank searchProblemRank = problemRank.orElse(ProblemRank.ALL);
         List<ProblemDto> problemDtos = problemService.searchProblems(searchProblemRank, searchtAlgorithm, pageable);
 
-        return Response.success(problemDtos);
+        return ResponseEntity.ok()
+                .body(Response.success(problemDtos));
     }
 }
