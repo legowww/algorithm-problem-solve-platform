@@ -3,6 +3,7 @@ package com.dev.az.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.util.Assert;
 
@@ -13,6 +14,7 @@ public class Email {
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("\\b[\\w\\.-]+@[\\w\\.-]+\\.\\w{2,4}\\b");
 
+    @Getter
     @Column(nullable = false, unique = true)
     private String email;
 

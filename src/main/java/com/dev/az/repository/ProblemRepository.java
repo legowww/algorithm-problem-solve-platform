@@ -14,6 +14,4 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
     Page<Problem> findByProblemRank(ProblemRank problemRank, Pageable pageable);
 
     Page<Problem> findByProblemRankAndAlgorithm(ProblemRank problemRank, Algorithm algorithm, Pageable pageable);
-
-    Page<Problem> findAll(Pageable pageable);
 }

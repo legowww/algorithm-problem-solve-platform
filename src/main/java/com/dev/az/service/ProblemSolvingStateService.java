@@ -9,6 +9,7 @@ import com.dev.az.model.entity.ProblemSolvingState;
 import com.dev.az.repository.MemberRepository;
 import com.dev.az.repository.ProblemRepository;
 import com.dev.az.repository.ProblemSolvingStateRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ProblemSolvingStateService {
 
     private final ProblemSolvingStateRepository problemSolvingStateRepository;
@@ -25,12 +27,6 @@ public class ProblemSolvingStateService {
     private final MemberRepository memberRepository;
 
     private final ProblemRepository problemRepository;
-
-    public ProblemSolvingStateService(ProblemSolvingStateRepository problemSolvingStateRepository, MemberRepository memberRepository, ProblemRepository problemRepository) {
-        this.problemSolvingStateRepository = problemSolvingStateRepository;
-        this.memberRepository = memberRepository;
-        this.problemRepository = problemRepository;
-    }
 
     public List<Long> findSuccessProblems(UUID id) {
         return problemSolvingStateRepository.findSuccessProblems(id)
@@ -51,8 +47,8 @@ public class ProblemSolvingStateService {
     }
 
     @Transactional
-    public void createState(SubmissionCreateRequest submissionCreateRequest, SubmissionResult submissionResult) {
-        Member member = memberRepository.getReferenceById(submissionCreateRequest.memberId());
+    public void createState(UUID memberId, SubmissionCreateRequest submissionCreateRequest, SubmissionResult submissionResult) {
+        Member member = memberRepository.getReferenceById(memberId);
         Problem problem = problemRepository.getReferenceById(submissionCreateRequest.problemId());
 
         Optional<ProblemSolvingState> stateOptional = problemSolvingStateRepository.findByMember_IdAndProblem_Id(member.getId(), problem.getId());

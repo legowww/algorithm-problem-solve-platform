@@ -6,6 +6,7 @@ import com.dev.az.model.ProblemRank;
 import com.dev.az.model.dto.ProblemDto;
 import com.dev.az.model.entity.Problem;
 import com.dev.az.repository.ProblemRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,20 +17,20 @@ import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ProblemService {
 
     private final ProblemRepository problemRepository;
 
-    public ProblemService(ProblemRepository problemRepository) {
-        this.problemRepository = problemRepository;
-    }
-
     @Transactional
-    public void createProblem(String title, String content, String problemCondition, Map<String, String> examples, ProblemRank problemRank, Algorithm algorithm) {
+    public long createProblem(String title, String content, String problemCondition, Map<String, String> examples, ProblemRank problemRank, Algorithm algorithm) {
         Problem problem = new Problem(title, content, problemCondition, examples, problemRank, algorithm);
         problemRepository.save(problem);
+
+        return problem.getId();
     }
 
+    //todo: 동적 쿼리
     public List<ProblemDto> searchProblems(ProblemRank problemRank, Algorithm algorithm, Pageable pageable) {
         //모든 문제 검색
         if (problemRank == ProblemRank.ALL && algorithm == Algorithm.ALL) {
