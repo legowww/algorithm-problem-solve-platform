@@ -12,6 +12,9 @@ import java.util.UUID;
 
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
-    @Query("select s from Submission s join s.problem where s.member.id = :id")
+    @Query("select s from Submission s join fetch s.problem where s.member.id = :id")
     Page<Submission> findAllSubmissions(@Param("id") UUID id, Pageable pageable);
 }
+
+
+

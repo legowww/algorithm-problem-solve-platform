@@ -13,7 +13,14 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @Entity
-@Table(name = "PROBLEM_TB")
+@Table(
+        name = "PROBLEM_TB",
+        indexes = {
+                @Index(name = "idx_created_at", columnList = "createdAt"),
+                @Index(name = "idx_algorithm", columnList = "algorithm"),
+                @Index(name = "idx_rank", columnList = "problemRank")
+        }
+        )
 @Getter
 public class Problem {
 
